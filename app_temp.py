@@ -71,19 +71,22 @@ df_junggo_total = df_junggo_amt + df_junggolease_amt + df_jaego_amt
 
 # 사이드바에 주요 지표 미리보기 추가
 st.sidebar.markdown("---")
-st.sidebar.header("💡 주요 지표 미리보기")
-st.sidebar.markdown(f"**📅 {selected_year}년 {selected_month_num}월 기준**")
+st.sidebar.markdown(
+    f'<span style="font-size:22px; font-weight:bold;">💡{selected_year}년 {selected_month_num}월 1일 ~ 현재</span>',
+    unsafe_allow_html=True)
+
 
 st.sidebar.markdown(f"""
-🚗 **신차 통합인수율**  
-　📊 {df_total_rate:.1f}%
+🚗 <span style="font-size:22px;"><b>신차 통합인수율</b></span>  
+　<span style="font-size:20px;">📊 {df_total_rate:.1f}%</span>
 
-💰 **신차 취급액**  
-　💵 {df_total_amt:,.0f}억원
+💰 <span style="font-size:22px;"><b>신차 취급액</b></span>  
+　<span style="font-size:20px;">💵 {df_total_amt:,.0f}억원</span>
 
-🔄 **중고 취급액**  
-　🏪 {df_junggo_total:,.0f}억원
-""")
+🔄 <span style="font-size:22px;"><b>중고 취급액</b></span>  
+　<span style="font-size:20px;">🏪 {df_junggo_total:,.0f}억원</span>
+""", unsafe_allow_html=True)
+
 
 # ===== 🎨 CSS 스타일 설정 =====
 st.markdown("""
@@ -98,7 +101,7 @@ h2 {
 
 # === 취급지표표 ===
 
-# ===== 📊 취급지표 표 (완전 독립 모듈) =====
+#===== 📊 취급지표 표 (완전 독립 모듈) =====
 st.markdown('<h2 style="font-size: 40px; margin-bottom: 0px; padding-bottom: 0px;">● 취급지표</h2>', unsafe_allow_html=True)
 st.markdown('<div style="text-align: right; font-size: 15px; color: #666; margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">(단위: %, 억원)</div>', unsafe_allow_html=True)
 
@@ -144,6 +147,12 @@ op_jaego_amt = op_loan_month[op_loan_month['product'] == '재고금융']['value'
 op_junggo_total = op_junggo_amt + op_junggolease_amt + op_jaego_amt
 
 # 달성률 계산
+## 인수율
+df_total_rate_progress = (df_total_rate / op_total_rate *100) if op_total_rate>0 else 0
+df_halbu_rate_progress = (df_halbu_rate / op_halbu_rate *100) if op_halbu_rate>0 else 0
+df_imdae_rate_progress = (df_imdae_rate / op_imdae_rate *100) if op_imdae_rate>0 else 0
+ 
+## 취급액  
 total_progress = (df_total_amt / op_total_amt * 100) if op_total_amt > 0 else 0
 halbu_progress = (df_halbu_amt / op_halbu_amt * 100) if op_halbu_amt > 0 else 0
 imdae_progress = (df_imdae_amt / op_imdae_amt * 100) if op_imdae_amt > 0 else 0
@@ -153,13 +162,21 @@ junggolease_progress = (df_junggolease_amt  / op_junggolease_amt * 100) if op_ju
 jaego_progress = (df_jaego_amt  / op_jaego_amt * 100) if op_jaego_amt > 0 else 0
 
 # 진척비
-total_wd = total_progress/100-1
-halbu_wd = halbu_progress/100-1
-imdae_wd = imdae_progress/100-1
-junggo_total_wd = junggo_total_progress/100-1
-junggo_wd = junggo_progress/100-1
-junggolease_wd = junggolease_progress/100-1
-jaego_wd = jaego_progress/100-1
+# total_wd = total_progress/100-1
+# halbu_wd = halbu_progress/100-1
+# imdae_wd = imdae_progress/100-1
+# junggo_total_wd = junggo_total_progress/100-1
+# junggo_wd = junggo_progress/100-1
+# junggolease_wd = junggolease_progress/100-1
+# jaego_wd = jaego_progress/100-1
+
+total_wd = total_progress-100
+halbu_wd = halbu_progress-100
+imdae_wd = imdae_progress-100
+junggo_total_wd = junggo_total_progress-100
+junggo_wd = junggo_progress-100
+junggolease_wd = junggolease_progress-100
+jaego_wd = jaego_progress-100
  
 
 # === 전월 데이터 계산 ===
@@ -254,7 +271,7 @@ combined_data = {
         f"{df_junggo_total:,.0f}", f"{df_junggo_amt:,.0f}", f"{df_junggolease_amt:,.0f}", f"{df_jaego_amt:,.0f}"
     ],
     (dynamic_month_header, '달성률'): [
-        '-', '-', '-',
+        f"{df_total_rate_progress:+.1f}%", f"{df_halbu_rate_progress:+.1f}%", f"{df_imdae_rate_progress:+.1f}%",
         f"{total_progress:+.1f}%", f"{halbu_progress:+.1f}%", f"{imdae_progress:+.1f}%",
         f"{junggo_total_progress:+.1f}%", f"{junggo_progress:+.1f}%", f"{junggolease_progress:+.1f}%", f"{jaego_progress:+.1f}%"
     ],
@@ -292,9 +309,24 @@ combined_data = {
     ]
 }
 
-# === 표 렌더링 ===
+# === 표 렌더링, download ===
 df_display = pd.DataFrame(combined_data)
 df_display.columns = pd.MultiIndex.from_tuples(df_display.columns)
+
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    f'<span style="font-size:22px; font-weight:bold;">📥 download summary  </span>',
+    unsafe_allow_html=True)
+
+import io
+excel_buffer = io.BytesIO()
+df_display.to_excel(excel_buffer, index=True)
+excel_buffer.seek(0)
+st.sidebar.download_button(label=f"{selected_year}년_{selected_month_num}월_취급지표",
+data=excel_buffer,file_name=f"{selected_year}년_{selected_month_num}월_취급지표.xlsx",
+mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 
 def create_custom_table_html(df):
     html = f"""
@@ -437,6 +469,12 @@ row = ['신차', '임대', '임대연장', 'total', 임대연장_취급액_합]
 row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
 current_loan_data = pd.concat([current_loan_data[:9],row_df, current_loan_data[9:]], ignore_index=True)
 
+#7.24 추가 
+할부_취급액_합 = current_loan_data[current_loan_data['구분2'] == '할부']['취급액'].sum() if '구분2' in current_loan_data.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
+current_loan_data = pd.concat([current_loan_data[:1],row_df, current_loan_data[1:]], ignore_index=True)
+
 
 # 당월 OP 데이터와 병합
 current_op_result = op_loan_amt[op_loan_amt['bas_yrmn'] == selected_month].groupby(groups)['value'].sum().reset_index()
@@ -472,6 +510,14 @@ row = ['신차', '임대', '임대연장', 'total', 임대연장_취급액_합]
 row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','value'])
 current_op_result = pd.concat([current_op_result[:9],row_df, current_op_result[9:]], ignore_index=True)
 current_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
+
+#7.24 추가
+할부_취급액_합 = current_op_result[current_op_result['구분2'] == '할부']['value'].sum() if '구분2' in current_op_result.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','value'])
+current_op_result = pd.concat([current_op_result[:1],row_df, current_op_result[1:]], ignore_index=True)
+current_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
+
 
 current_loan_result = pd.merge(current_loan_data, current_op_result, 
    left_on=['구분1','구분2','구분3','구분4'], right_on=['구분1','구분2','구분3','구분4'], 
@@ -511,6 +557,12 @@ row = ['신차', '임대', '임대연장', 'total', 임대연장_취급액_합]
 row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
 prev_loan_data = pd.concat([prev_loan_data[:9],row_df, prev_loan_data[9:]], ignore_index=True)
 
+#7.24 추가 
+할부_취급액_합 = prev_loan_data[prev_loan_data['구분2'] == '할부']['취급액'].sum() if '구분2' in prev_loan_data.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
+prev_loan_data = pd.concat([prev_loan_data[:1],row_df, prev_loan_data[1:]], ignore_index=True)
+
 # # 전월 OP 데이터와 병합
 prev_op_result = op_loan_amt[op_loan_amt['bas_yrmn'] == prev_month].groupby(groups)['value'].sum().reset_index()
 prev_op_result['sort_key'] = prev_op_result.apply(custom_sort_key, axis=1)
@@ -545,6 +597,14 @@ row = ['신차', '임대', '임대연장', 'total', 임대연장_취급액_합]
 row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','value'])
 prev_op_result = pd.concat([prev_op_result[:9],row_df, prev_op_result[9:]], ignore_index=True)
 prev_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
+
+#7.24 추가 
+할부_취급액_합 = prev_op_result[prev_op_result['구분3'] == '할부']['value'].sum() if '구분2' in prev_op_result.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','value'])
+prev_op_result = pd.concat([prev_op_result[:9],row_df, prev_op_result[9:]], ignore_index=True)
+prev_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
+
 
 prev_loan_result = pd.merge(prev_loan_data, prev_op_result, 
    left_on=['구분1','구분2','구분3','구분4'], right_on=['구분1','구분2','구분3','구분4'], 
@@ -585,6 +645,12 @@ row = ['신차', '임대', '임대연장', 'total', 임대연장_취급액_합]
 row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
 cumulative_loan_data = pd.concat([cumulative_loan_data[:9],row_df, cumulative_loan_data[9:]], ignore_index=True)
 
+#7.24 추가 
+할부_취급액_합 = cumulative_loan_data[cumulative_loan_data['구분2'] == '할부']['취급액'].sum() if '구분2' in cumulative_loan_data.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','취급액'])
+cumulative_loan_data = pd.concat([cumulative_loan_data[:1],row_df, cumulative_loan_data[1:]], ignore_index=True)
+
 
 # # 누적 OP 데이터와 병합
 cumulative_op_result= op_loan_amt[op_loan_amt['bas_yrmn'].isin(cumulative_months)].groupby(groups)['value'].sum().reset_index()
@@ -623,18 +689,25 @@ row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','v
 cumulative_op_result= pd.concat([cumulative_op_result[:9],row_df, cumulative_op_result[9:]], ignore_index=True)
 cumulative_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
 
+#7.24 추가 
+할부_취급액_합 = cumulative_op_result[cumulative_op_result['구분2'] == '할부']['value'].sum() if '구분2' in cumulative_op_result.columns else None
+row = ['신차', '할부', 'total', 'total', 할부_취급액_합]
+row_df = pd.DataFrame([row], columns=['구분1','구분2','구분3','구분4','value'])
+cumulative_op_result = pd.concat([cumulative_op_result[:1],row_df, cumulative_op_result[1:]], ignore_index=True)
+cumulative_op_result.drop(columns=['bas_yrmn', 'product','depart'], inplace=True, errors='ignore')
+
 
 cumulative_loan_result = pd.merge(cumulative_loan_data, cumulative_op_result, 
    left_on=['구분1','구분2','구분3','구분4'], right_on=['구분1','구분2','구분3','구분4'], 
    how='inner').rename(columns={'취급액': '취급액', 'value': 'OP_취급액'}).reset_index(drop=True)
 
-    
-new=['신차','할부 - 신차영업팀','할부 - 플랫폼영업팀','할부 - Auto법인마케팅팀','임대','신규','신차영업팀','플랫폼영업팀','Auto법인마케팅팀',
-'연장','신차영업팀','플랫폼영업팀','Auto법인마케팅팀','중고','중고론 - 중고영업팀','중고론 - 플랫폼영업팀','중고론 - Auto법인마케팅팀',
+new=['신차','할부','할부 - 신차영업팀','할부 - 플랫폼영업팀','할부 - Auto법인마케팅팀','임대','임대신규','신차영업팀','플랫폼영업팀','Auto법인마케팅팀',
+'임대연장','신차영업팀','플랫폼영업팀','Auto법인마케팅팀','중고','중고론 - 중고영업팀','중고론 - 플랫폼영업팀','중고론 - Auto법인마케팅팀',
 '중고리스 - 중고영업팀','중고리스 - 플랫폼영업팀','중고리스 - Auto법인마케팅팀','재고금융 - 중고영업팀']
 current_loan_result.insert(0,'구분',new)
 prev_loan_result.insert(0,'구분',new)
 cumulative_loan_result.insert(0,'구분',new)
+
     
 
 def create_product_loan_table_data():
@@ -668,13 +741,13 @@ def create_product_loan_table_data():
 
         table_rows.append([
             row['구분'],
-            f"{당월_OP:,.0f}",
-            f"{당월_실적:,.0f}",
-            f"{당월_달성률:.1f}%",
-            f"{전월대비:+,.0f}",
-            f"{누적_OP:,.0f}",
-            f"{누적_실적:,.0f}",
-            f"{누적_달성률:.1f}%"
+            f"{당월_OP:,.2f}",
+            f"{당월_실적:,.2f}",
+            f"{당월_달성률:.2f}%",
+            f"{전월대비:+,.2f}",
+            f"{누적_OP:,.2f}",
+            f"{누적_실적:,.2f}",
+            f"{누적_달성률:.2f}%"
         ])
 
     return table_rows
@@ -682,9 +755,26 @@ def create_product_loan_table_data():
 dynamic_month_header = f"당월('{year_short}.{selected_month_num}월)"
 dynamic_cumulative_header = f"누적('{year_short}.1~{selected_month_num}월)"
 table_data = create_product_loan_table_data()    
-    
+df_table_data =pd.DataFrame(table_data,columns=['구분','당월_OP','당월_실적','당월_달성률','전월대비','누적_OP','누적_실적','누적_달성률'])
 
-# === 모든 셀에 구분별 스타일을 적용하는 커스텀 테이블 함수 ===
+
+excel_buffer = io.BytesIO()
+df_table_data.to_excel(excel_buffer, index=True)
+excel_buffer.seek(0)
+st.sidebar.download_button(label=f"{selected_year}년_{selected_month_num}월_상품별취급액",
+data=excel_buffer,
+file_name=f"{selected_year}년_{selected_month_num}월_상품별취급액.xlsx",
+mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+
+st.sidebar.markdown("---")
+st.sidebar.markdown(
+    f'<span style="font-size:22px; font-weight:bold;">📥 download source(not yet) </span>',
+    unsafe_allow_html=True)
+
+
+
+#=== 모든 셀에 구분별 스타일을 적용하는 커스텀 테이블 함수 ===
 def create_product_loan_custom_table_html_fullstyle(data):
     html = f"""
     <div style="overflow-x: auto; margin: 0px; padding: 0px;">
@@ -710,10 +800,12 @@ def create_product_loan_custom_table_html_fullstyle(data):
     for i, row in enumerate(data):
         구분 = row[0]
         # subtotal 스타일 지정
-        if 구분 in ['신차', '임대', '중고']:
+        if 구분 in ['신차', '중고']:
             cell_style = "background-color: #bfdbfe; color: #3b82f6; font-weight: bold; text-align: center;"
-        elif 구분 in ['신규', '연장']:
+        elif 구분 in ['할부', '임대']:
             cell_style = "background-color: #e0f2fe; color: #60a5fa; font-weight: bold; text-align: center;"
+        elif 구분 in ['임대신규', '임대연장']:
+            cell_style = "background-color: #f0f9ff; color: black; font-weight: bold; text-align: center;"
         else:
             cell_style = "background-color: white; color: black; font-weight: normal; text-align: center;"
         html += f'<tr>'
@@ -730,7 +822,7 @@ def create_product_loan_custom_table_html_fullstyle(data):
     """
     return html
 
-# # === 표 렌더링 예시 ===
+# # # === 표 렌더링 예시 ===
 custom_product_table_html_fullstyle = create_product_loan_custom_table_html_fullstyle(table_data)
 st.markdown(custom_product_table_html_fullstyle, unsafe_allow_html=True)
 
