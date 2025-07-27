@@ -35,7 +35,7 @@ df_handover, df_loan_amt, op_handover, op_loan_amt = load_data()
 st.title("Auto 본부 사업 현황")
 
 # 사이드바 설정 - 기준년월 선택
-st.sidebar.header("📊 데이터 설정")
+st.sidebar.header(" 데이터 설정")
 months = sorted(df_handover['기준년월'].unique(), reverse=True)
 selected_month = st.sidebar.selectbox("기준년월 선택", months)
 
@@ -71,38 +71,26 @@ df_junggo_total = df_junggo_amt + df_junggolease_amt + df_jaego_amt
 
 # 사이드바에 주요 지표 미리보기 추가
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    f'<span style="font-size:22px; font-weight:bold;">💡{selected_year}년 {selected_month_num}월 1일 ~ 현재</span>',
-    unsafe_allow_html=True)
+st.sidebar.markdown(f'<span style="font-size:22px; font-weight:bold;">Summary </span>',unsafe_allow_html=True)
 
-
-st.sidebar.markdown(f"""
-🚗 <span style="font-size:22px;"><b>신차 통합인수율</b></span>  
-　<span style="font-size:20px;">📊 {df_total_rate:.1f}%</span>
-
-💰 <span style="font-size:22px;"><b>신차 취급액</b></span>  
-　<span style="font-size:20px;">💵 {df_total_amt:,.0f}억원</span>
-
-🔄 <span style="font-size:22px;"><b>중고 취급액</b></span>  
-　<span style="font-size:20px;">🏪 {df_junggo_total:,.0f}억원</span>
+st.sidebar.markdown(f"""<span style="font-size:22px;"><b> - 신차 통합인수율 : </b></span> <span style="font-size:22px;"> {df_total_rate:.1f}%</span><br><span style="font-size:22px;"><b> - 신차 취급액 : </b></span> <span style="font-size:22px;"> {df_total_amt:,.0f}억원</span><br><span style="font-size:22px;"><b> - 취급중고 취급액 : </b></span> <span style="font-size:22px;"> {df_junggo_total:,.0f}억원</span>
 """, unsafe_allow_html=True)
 
-
-# ===== 🎨 CSS 스타일 설정 =====
-st.markdown("""
-<style>
-h2 {
-    font-size: 18px !important;
-    margin-top: 30px !important;
-}
-</style>
-""", unsafe_allow_html=True)
+# # =====  CSS 스타일 설정 =====
+# st.markdown("""
+# <style>
+# h2 {
+#     font-size: 18px !important;
+#     margin-top: 30px !important;
+# }
+# </style>
+# """, unsafe_allow_html=True)
 
 
 # === 취급지표표 ===
 
-#===== 📊 취급지표 표 (완전 독립 모듈) =====
-st.markdown('<h2 style="font-size: 40px; margin-bottom: 0px; padding-bottom: 0px;">● 취급지표</h2>', unsafe_allow_html=True)
+#=====  취급지표 표 (완전 독립 모듈) =====
+st.markdown('<h2 style="font-size: 25px; margin-bottom: 0px; padding-bottom: 0px;">● 취급지표</h2>', unsafe_allow_html=True)
 st.markdown('<div style="text-align: right; font-size: 15px; color: #666; margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">(단위: %, 억원)</div>', unsafe_allow_html=True)
 
 # === 당월 데이터 계산 ===
@@ -162,14 +150,6 @@ junggolease_progress = (df_junggolease_amt  / op_junggolease_amt * 100) if op_ju
 jaego_progress = (df_jaego_amt  / op_jaego_amt * 100) if op_jaego_amt > 0 else 0
 
 # 진척비
-# total_wd = total_progress/100-1
-# halbu_wd = halbu_progress/100-1
-# imdae_wd = imdae_progress/100-1
-# junggo_total_wd = junggo_total_progress/100-1
-# junggo_wd = junggo_progress/100-1
-# junggolease_wd = junggolease_progress/100-1
-# jaego_wd = jaego_progress/100-1
-
 total_wd = total_progress-100
 halbu_wd = halbu_progress-100
 imdae_wd = imdae_progress-100
@@ -316,7 +296,7 @@ df_display.columns = pd.MultiIndex.from_tuples(df_display.columns)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(
-    f'<span style="font-size:22px; font-weight:bold;">📥 download summary  </span>',
+    f'<span style="font-size:22px; font-weight:bold;"> > download summary < </span>',
     unsafe_allow_html=True)
 
 import io
@@ -382,8 +362,8 @@ st.markdown(custom_table_html, unsafe_allow_html=True)
 
 # === 상품별취급액사업실별_HTML커스텀 ===
 
-# ===== 📊 상품별 취급액(사업실별) 표 (HTML 커스텀 테이블) =====
-st.markdown('<h2 style="font-size: 40px; margin-bottom: 0px; padding-bottom: 0px;">● 상품별 취급액</h2>', unsafe_allow_html=True)
+# =====  상품별 취급액(사업실별) 표 (HTML 커스텀 테이블) =====
+st.markdown('<h2 style="font-size: 25px; margin-bottom: 0px; padding-bottom: 0px;">● 상품별 취급액</h2>', unsafe_allow_html=True)
 st.markdown('<div style="text-align: right; font-size: 15px; color: #666; margin-top: 0px; margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px;">(단위: %, 억원)</div>', unsafe_allow_html=True)
 
 op_loan_amt.insert(0, '구분1' ,np.where(op_loan_amt['product'].isin(['중고론', '중고리스', '재고금융']), '중고','신차'))
@@ -768,9 +748,9 @@ mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 
 st.sidebar.markdown("---")
-st.sidebar.markdown(
-    f'<span style="font-size:22px; font-weight:bold;">📥 download source(not yet) </span>',
-    unsafe_allow_html=True)
+# st.sidebar.markdown(
+#     f'<span style="font-size:22px; font-weight:bold;">📥 download source(not yet) </span>',
+#     unsafe_allow_html=True)
 
 
 
@@ -800,8 +780,8 @@ def create_product_loan_custom_table_html_fullstyle(data):
     for i, row in enumerate(data):
         구분 = row[0]
         # subtotal 스타일 지정
-        if 구분 in ['신차', '중고']:
-            cell_style = "background-color: #bfdbfe; color: #3b82f6; font-weight: bold; text-align: center;"
+        if 구분 in ['신차', '중고']:  
+            cell_style = "background-color: #bfdbfe; color: #1e40af; font-weight: bold; text-align: center;"
         elif 구분 in ['할부', '임대']:
             cell_style = "background-color: #e0f2fe; color: #60a5fa; font-weight: bold; text-align: center;"
         elif 구분 in ['임대신규', '임대연장']:
